@@ -4,539 +4,629 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>ZIP Manager</title>
+    <title>ZIP File Manager</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 30px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
             color: #333;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 600;
-            color: #1a1a2e;
-        }
-
-        .header p {
-            color: #666;
-            margin-top: 8px;
-            font-size: 14px;
-        }
-
-        /* Stats Cards */
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            flex: 1;
-            min-width: 150px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .stat-card h2 {
-            font-size: 32px;
-            color: #4f46e5;
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            font-size: 13px;
-            color: #666;
-        }
-
-        /* Two Column Layout */
-        .two-columns {
-            display: flex;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
-
-        .column {
-            flex: 1;
-            min-width: 280px;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #4f46e5;
-            display: inline-block;
-        }
-
-        /* Upload Area */
-        .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 10px;
-            padding: 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-            background: #fafafa;
-        }
-
-        .upload-area:hover {
-            border-color: #4f46e5;
-            background: #f0f0ff;
-        }
-
-        .upload-area .icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .upload-area p {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .upload-area small {
-            font-size: 12px;
-            color: #999;
-        }
-
-        /* File List */
-        .file-list {
-            max-height: 350px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .file-item {
+        .topbar {
+            background: #1e1e2e;
+            padding: 14px 30px;
             display: flex;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
+        .topbar h1 { color: #fff; font-size: 20px; font-weight: 700; }
+        .topbar span { color: #a0a0b0; font-size: 13px; }
 
-        .file-item:hover {
-            background: #f9f9f9;
+        .tab-nav {
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            gap: 0;
+            padding: 0 30px;
         }
-
-        .file-item input {
-            margin-right: 12px;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .file-item label {
-            flex: 1;
+        .tab-btn {
+            padding: 14px 20px;
+            border: none;
+            background: none;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
         }
-
-        .file-size {
-            font-size: 12px;
-            color: #999;
-            margin-left: 10px;
+        .tab-btn.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
         }
+        .tab-btn:hover { color: #4f46e5; }
 
-        .file-actions {
+        .container { max-width: 1300px; margin: 0 auto; padding: 25px 20px; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 18px 22px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-left: 4px solid #4f46e5;
+        }
+        .stat-card h2 { font-size: 30px; color: #4f46e5; font-weight: 800; }
+        .stat-card p  { font-size: 12px; color: #888; margin-top: 4px; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .two-col { display: flex; gap: 22px; flex-wrap: wrap; }
+        .col      { flex: 1; min-width: 280px; }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
             display: flex;
+            align-items: center;
             gap: 8px;
         }
 
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 28px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: #fafafa;
+            margin-bottom: 16px;
+        }
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: #4f46e5;
+            background: #eef2ff;
+        }
+        .upload-area .icon { font-size: 36px; margin-bottom: 8px; }
+        .upload-area p { font-size: 14px; color: #555; }
+        .upload-area small { font-size: 12px; color: #aaa; }
+
+        .select-all-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .file-list {
+            max-height: 320px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 9px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 10px;
+        }
+        .file-item:last-child { border-bottom: none; }
+        .file-item:hover { background: #f9f9ff; }
+        .file-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #4f46e5; }
+        .file-item label { flex: 1; cursor: pointer; font-size: 13px; }
+        .file-size { font-size: 11px; color: #aaa; white-space: nowrap; }
+        .file-actions { display: flex; gap: 4px; }
         .file-actions button {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 14px;
-            padding: 4px 8px;
-            border-radius: 6px;
+            font-size: 13px;
+            padding: 4px 7px;
+            border-radius: 5px;
             opacity: 0.6;
         }
+        .file-actions button:hover { opacity: 1; background: #f0f0f0; }
 
-        .file-actions button:hover {
-            opacity: 1;
-            background: #f0f0f0;
-        }
-
-        .select-all {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .select-all label {
+        .folder-item {
             display: flex;
             align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
             gap: 10px;
+        }
+        .folder-item:last-child { border-bottom: none; }
+        .folder-item:hover { background: #f9f9ff; }
+        .folder-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #4f46e5; }
+        .folder-badge {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+
+        .password-wrap { margin: 12px 0; }
+        .password-wrap input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .password-wrap input:focus { outline: none; border-color: #4f46e5; }
+
+        .progress-wrap { margin: 12px 0; display: none; }
+        .progress-bar { height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #4f46e5, #7c3aed); transition: width 0.4s; border-radius: 10px; }
+        .progress-text { text-align: center; font-size: 12px; color: #666; margin-top: 6px; }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 8px;
         }
+        .btn-primary   { background: #4f46e5; color: #fff; }
+        .btn-primary:hover   { background: #4338ca; }
+        .btn-green     { background: #10b981; color: #fff; }
+        .btn-green:hover     { background: #059669; }
+        .btn-orange    { background: #f59e0b; color: #fff; }
+        .btn-orange:hover    { background: #d97706; }
+        .btn-purple    { background: #7c3aed; color: #fff; }
+        .btn-purple:hover    { background: #6d28d9; }
+        .btn-red       { background: #ef4444; color: #fff; }
+        .btn-red:hover       { background: #dc2626; }
+        .btn:disabled  { opacity: 0.6; cursor: not-allowed; }
 
-        /* Password Input */
-        .password-input {
-            margin: 15px 0;
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { color: #888; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        tr:hover td { background: #f9f9f9; }
+        .empty { text-align: center; padding: 40px; color: #bbb; font-size: 14px; }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
         }
+        .badge-green  { background: #dcfce7; color: #16a34a; }
+        .badge-red    { background: #fee2e2; color: #dc2626; }
+        .badge-yellow { background: #fef9c3; color: #ca8a04; }
+        .badge-blue   { background: #dbeafe; color: #2563eb; }
+        .badge-gray   { background: #f3f4f6; color: #6b7280; }
 
-        .password-input input {
+        .job-row td { font-size: 12px; }
+        .poll-btn {
+            font-size: 11px;
+            padding: 3px 10px;
+            background: #eef2ff;
+            color: #4f46e5;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .poll-btn:hover { background: #e0e7ff; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 26px;
+            max-width: 520px;
+            width: 92%;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h3 { font-size: 17px; font-weight: 700; }
+        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #aaa; }
+        .preview-body {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+        .modal-input {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
+            margin-bottom: 14px;
         }
+        .modal-input:focus { outline: none; border-color: #4f46e5; }
 
-        .password-input input:focus {
-            outline: none;
-            border-color: #4f46e5;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            width: 100%;
-        }
-
-        .btn-primary {
-            background: #4f46e5;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #4338ca;
-        }
-
-        .btn-secondary {
-            background: #10b981;
-            color: white;
-            margin-top: 10px;
-        }
-
-        .btn-secondary:hover {
-            background: #059669;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            margin: 15px 0;
-            display: none;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: #4f46e5;
-            transition: width 0.3s;
-        }
-
-        .progress-text {
-            text-align: center;
-            font-size: 12px;
-            margin-top: 6px;
-            color: #666;
-        }
-
-        /* Table */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            color: #666;
-            font-weight: 500;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-size: 14px;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .modal-header h3 {
-            font-size: 18px;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-        }
-
-        .preview-content {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 12px;
-            overflow-x: auto;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        /* Toast */
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #333;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: 10px;
             font-size: 13px;
+            font-weight: 500;
+            color: #fff;
             display: none;
-            z-index: 2000;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 320px;
         }
-
-        /* Utility */
-        .text-center {
-            text-align: center;
-        }
-        .mt-2 {
-            margin-top: 8px;
-        }
-        .mt-3 {
-            margin-top: 12px;
-        }
-        .mb-2 {
-            margin-bottom: 8px;
-        }
+        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Header -->
-    <div class="header">
-        <h1> ZIP File Manager</h1>
-        
-    </div>
+<div class="topbar">
+    <h1>📦 ZIP File Manager</h1>
+    <span>Laravel ZipStream — Background Queue + Multi-Folder Support</span>
+</div>
 
-    <!-- Stats -->
+<div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('files')">📁 Files</button>
+    <button class="tab-btn" onclick="switchTab('folders')">🗂 Folders</button>
+    <button class="tab-btn" onclick="switchTab('queue')">⚙️ Background Jobs</button>
+    <button class="tab-btn" onclick="switchTab('history')">📋 History</button>
+</div>
+
+<div class="container">
+
     <div class="stats">
         <div class="stat-card">
-            <h2 id="totalFiles">0</h2>
+            <h2 id="statFiles">{{ count($availableFiles) }}</h2>
             <p>Available Files</p>
         </div>
         <div class="stat-card">
-            <h2 id="selectedCount">0</h2>
-            <p>Selected Files</p>
+            <h2 id="statFolders">{{ count($availableFolders) }}</h2>
+            <p>Folders</p>
+        </div>
+        <div class="stat-card">
+            <h2 id="statSelected">0</h2>
+            <p>Selected</p>
         </div>
         <div class="stat-card">
             <h2>{{ $downloads->count() }}</h2>
-            <p>Downloads</p>
+            <p>Total Downloads</p>
+        </div>
+        <div class="stat-card">
+            <h2>{{ $zipJobs->where('status','completed')->count() }}</h2>
+            <p>Jobs Done</p>
         </div>
     </div>
 
-    <!-- Two Columns -->
-    <div class="two-columns">
-        <!-- Left Column - File Selection -->
-        <div class="column">
-            <div class="card">
-                <h3>Select Files</h3>
+    <div id="tab-files" class="tab-panel active">
+        <div class="two-col">
 
-                <!-- Upload Area -->
-                <div class="upload-area" id="uploadArea">
-                    <div class="icon"></div>
-                    <p>Click or drag files here</p>
-                    <small>Max 10MB per file</small>
-                    <input type="file" id="fileInput" style="display: none" multiple>
-                </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-title">📁 Select Files</div>
 
-                <!-- Select All -->
-                <div class="select-all">
-                    <label>
-                        <input type="checkbox" id="selectAllCheckbox">
-                        <span>Select All Files</span>
-                    </label>
-                </div>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="icon">☁️</div>
+                        <p>Click or drag files here to upload</p>
+                        <small>Max 10MB per file</small>
+                        <input type="file" id="fileInput" style="display:none" multiple>
+                    </div>
 
-                <!-- File List -->
-                <div class="file-list" id="fileList">
-                    @if(count($availableFiles) > 0)
-                        @foreach($availableFiles as $index => $file)
+                    <div class="select-all-row" onclick="toggleSelectAll()">
+                        <input type="checkbox" id="selectAllCb" onclick="event.stopPropagation(); toggleSelectAll()">
+                        <span>Select All ({{ count($availableFiles) }} files)</span>
+                    </div>
+
+                    <div class="file-list">
+                        @forelse($availableFiles as $index => $file)
                             <div class="file-item">
-                                <input type="checkbox" class="file-checkbox" value="{{ $file }}" id="file_{{ $index }}">
-                                <label for="file_{{ $index }}">
-                                     {{ $file }}
+                                <input type="checkbox" class="file-cb" value="{{ $file }}" id="f_{{ $index }}">
+                                <label for="f_{{ $index }}">
+                                    {{ $file }}
                                     <span class="file-size">
                                         @php
-                                            $path = storage_path('app/public/'.$file);
-                                            if(file_exists($path)) {
-                                                echo round(filesize($path)/1024, 1) . ' KB';
-                                            } else {
-                                                echo '0 KB';
-                                            }
+                                            $p = storage_path('app/public/'.$file);
+                                            echo file_exists($p) ? round(filesize($p)/1024,1).' KB' : '';
                                         @endphp
                                     </span>
                                 </label>
                                 <div class="file-actions">
-                                    <button onclick="previewFile('{{ $file }}')" title="Preview"></button>
-                                    <button onclick="deleteFile('{{ $file }}')" title="Delete"></button>
+                                    <button onclick="previewFile('{{ $file }}')" title="Preview">👁</button>
+                                    <button onclick="deleteFile('{{ $file }}')" title="Delete">🗑</button>
                                 </div>
                             </div>
-                        @endforeach
-                    @else
-                        <div class="empty-state">
-                            No files available. Upload some files above.
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Password -->
-                <div class="password-input">
-                    <input type="password" id="zipPassword" placeholder="Password (optional)">
-                </div>
-
-                <!-- Progress -->
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
+                        @empty
+                            <div class="empty">No files found. Upload some above.</div>
+                        @endforelse
                     </div>
-                    <div class="progress-text" id="progressText">Preparing...</div>
+
+                    <div class="password-wrap">
+                        <input type="password" id="zipPassword" placeholder="🔒 Password protect ZIP (optional)">
+                    </div>
+
+                    <div class="progress-wrap" id="progressWrap">
+                        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                        <div class="progress-text" id="progressText">Preparing...</div>
+                    </div>
+
+                    <button class="btn btn-primary" id="btnDownload">⬇️ Download ZIP (Direct)</button>
+                    <button class="btn btn-green"   id="btnEmail">📧 Send via Email</button>
+                    <button class="btn btn-purple"  id="btnQueue">⚙️ Process in Background</button>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card" id="linkCard" style="display:none">
+                    <div class="card-title">🔗 Download Link Ready</div>
+                    <p style="font-size:13px;color:#555;margin-bottom:10px;">Share this link (expires in 24 hours):</p>
+                    <div style="background:#f0f4ff;padding:12px;border-radius:8px;font-size:12px;word-break:break-all;" id="generatedLink"></div>
+                    <button class="btn btn-primary" style="margin-top:12px" onclick="copyLink()">📋 Copy Link</button>
+                    <button class="btn btn-green" style="margin-top:8px" onclick="openLink()">⬇️ Download Now</button>
                 </div>
 
-                <!-- Buttons -->
-                <button class="btn btn-primary" id="downloadBtn"> Download ZIP</button>
-                <button class="btn btn-secondary" id="emailBtn"> Email Link</button>
-            </div>
-        </div>
+                <div class="card" id="jobCard" style="display:none">
+                    <div class="card-title">⚙️ Background Job Queued</div>
+                    <p style="font-size:13px;color:#555;margin-bottom:12px">
+                        ZIP is being processed in background. Run queue worker if not running:<br>
+                        <code style="background:#f0f0f0;padding:4px 8px;border-radius:4px;font-size:12px;">php artisan queue:work</code>
+                    </p>
+                    <div id="jobStatus" style="font-size:13px"></div>
+                    <button class="btn btn-orange" id="btnCheckJob" style="display:none" onclick="checkJobStatus()">🔄 Check Status</button>
+                </div>
 
-        <!-- Right Column - Recent Downloads -->
-        <div class="column">
-            <div class="card">
-                <h3>Recent Downloads</h3>
-                <div class="table-wrapper">
-                    @if($downloads->count() > 0)
-                        <table>
-                            <thead>
-                                <tr><th>ZIP Name</th><th>Files</th><th></th></tr>
-                            </thead>
-                            <tbody>
-                                @foreach($downloads as $download)
+                <div class="card">
+                    <div class="card-title">📋 Recent Downloads</div>
+                    <div class="table-wrap">
+                        @if($downloads->count())
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td>{{ Str::limit($download->zip_name, 30) }}</td>
-                                        <td>{{ $download->total_files }}</td>
-                                        <td>{{ $download->is_password_protected ? 'Yes' : 'No' }}</td>
+                                        <th>ZIP Name</th>
+                                        <th>Files</th>
+                                        <th>Password</th>
+                                        <th>Date</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <div class="empty-state">No downloads yet</div>
-                    @endif
+                                </thead>
+                                <tbody>
+                                    @foreach($downloads as $d)
+                                        <tr>
+                                            <td>{{ Str::limit($d->zip_name, 28) }}</td>
+                                            <td>{{ $d->total_files }}</td>
+                                            <td>
+                                                @if($d->is_password_protected)
+                                                    <span class="badge badge-yellow">🔒 Yes</span>
+                                                @else
+                                                    <span class="badge badge-gray">No</span>
+                                                @endif
+                                            </td>
+                                            <td style="font-size:11px;color:#aaa">{{ $d->created_at->diffForHumans() }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @else
+                            <div class="empty">No downloads yet</div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div id="tab-folders" class="tab-panel">
+        <div class="two-col">
+            <div class="col">
+                <div class="card">
+                    <div class="card-title">🗂 Select Folders to ZIP</div>
+                    <p style="font-size:13px;color:#777;margin-bottom:14px">
+                        Select folders — all files inside them (including sub-folders) will be added recursively.
+                    </p>
+
+                    <div class="file-list">
+                        @forelse($availableFolders as $folder)
+                            <div class="folder-item">
+                                <input type="checkbox" class="folder-cb" value="{{ $folder['name'] }}" id="folder_{{ $loop->index }}">
+                                <label for="folder_{{ $loop->index }}" style="cursor:pointer;font-size:13px">
+                                    📁 {{ $folder['name'] }}
+                                </label>
+                                <span class="folder-badge">{{ $folder['file_count'] }} files</span>
+                            </div>
+                        @empty
+                            <div class="empty">
+                                No folders found in storage/app/public/<br>
+                                <small>Create folders and add files there</small>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <div class="progress-wrap" id="folderProgressWrap">
+                        <div class="progress-bar"><div class="progress-fill" id="folderProgressFill"></div></div>
+                        <div class="progress-text" id="folderProgressText">Preparing...</div>
+                    </div>
+
+                    <button class="btn btn-primary" id="btnFolderDownload">📦 Download Folder ZIP</button>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-title">ℹ️ How Multi-Folder ZIP Works</div>
+                    <div style="font-size:13px;color:#555;line-height:1.8">
+                        <p>✅ Select multiple folders at once</p>
+                        <p>✅ Sub-folders are included recursively</p>
+                        <p>✅ Original folder structure is preserved in ZIP</p>
+                        <p>✅ Direct streaming — no temporary file saved on server</p>
+                        <br>
+                        <p style="color:#888;font-size:12px">
+                            Folders location: <code>storage/app/public/[folder-name]/</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-queue" class="tab-panel">
+        <div class="card">
+            <div class="card-title">⚙️ Background Job Status</div>
+            <p style="font-size:13px;color:#666;margin-bottom:16px;">
+                Jobs are processed in the queue. Make sure to run <code>php artisan queue:work</code>.
+            </p>
+
+            <div class="table-wrap">
+                @if($zipJobs->count())
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ZIP Name</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jobsTableBody">
+                            @foreach($zipJobs as $job)
+                                <tr id="jobRow_{{ $job->id }}" class="job-row">
+                                    <td>{{ $job->id }}</td>
+                                    <td>{{ Str::limit($job->zip_name, 30) }}</td>
+                                    <td>
+                                        @if($job->status === 'completed')
+                                            <span class="badge badge-green">✅ Completed</span>
+                                        @elseif($job->status === 'processing')
+                                            <span class="badge badge-blue">⚙️ Processing</span>
+                                        @elseif($job->status === 'failed')
+                                            <span class="badge badge-red">❌ Failed</span>
+                                        @else
+                                            <span class="badge badge-yellow">⏳ Pending</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $job->created_at->diffForHumans() }}</td>
+                                    <td>
+                                        @if($job->status === 'completed')
+                                            <a href="{{ route('zip.job.download', $job->id) }}" class="poll-btn" style="text-decoration:none">⬇️ Download</a>
+                                        @elseif(in_array($job->status, ['pending','processing']))
+                                            <button class="poll-btn" onclick="pollJob({{ $job->id }})">🔄 Refresh</button>
+                                        @else
+                                            <span style="color:#aaa;font-size:11px;">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="empty">
+                        No background jobs yet.<br>
+                        <small>Use "Process in Background" button in the Files tab.</small>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-history" class="tab-panel">
+        <div class="card">
+            <div class="card-title">📋 All Download History</div>
+            <div class="table-wrap">
+                @if($downloads->count())
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ZIP Name</th>
+                                <th>Files</th>
+                                <th>Password</th>
+                                <th>IP</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($downloads as $d)
+                                <tr>
+                                    <td>{{ $d->zip_name }}</td>
+                                    <td>{{ $d->total_files }}</td>
+                                    <td>
+                                        @if($d->is_password_protected)
+                                            <span class="badge badge-yellow">🔒 Yes</span>
+                                        @else
+                                            <span class="badge badge-gray">No</span>
+                                        @endif
+                                    </td>
+                                    <td style="font-size:12px;color:#aaa">{{ $d->user_ip ?? '—' }}</td>
+                                    <td style="font-size:12px;color:#aaa">{{ $d->created_at->format('d M Y H:i') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="empty">No history yet</div>
+                @endif
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- Preview Modal -->
-<div id="previewModal" class="modal">
-    <div class="modal-content">
+<div class="modal" id="previewModal">
+    <div class="modal-box">
         <div class="modal-header">
-            <h3 id="previewTitle">File Preview</h3>
-            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h3 id="previewTitle">Preview</h3>
+            <button class="modal-close" onclick="closeModal('previewModal')">&times;</button>
         </div>
-        <div id="previewBody" class="preview-content">Loading...</div>
+        <div id="previewBody" class="preview-body">Loading...</div>
     </div>
 </div>
 
-<!-- Email Modal -->
-<div id="emailModal" class="modal">
-    <div class="modal-content">
+<div class="modal" id="emailModal">
+    <div class="modal-box">
         <div class="modal-header">
-            <h3>Send Download Link</h3>
-            <button class="close-modal" onclick="closeEmailModal()">&times;</button>
+            <h3>📧 Send Download Link</h3>
+            <button class="modal-close" onclick="closeModal('emailModal')">&times;</button>
         </div>
-        <input type="email" id="recipientEmail" placeholder="Email address" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:8px;">
+        <input type="email" class="modal-input" id="recipientEmail" placeholder="Enter email address">
         <button class="btn btn-primary" onclick="sendEmailLink()">Send Link</button>
     </div>
 </div>
@@ -544,227 +634,319 @@
 <div id="toast" class="toast"></div>
 
 <script>
-    let selectedFiles = new Set();
+function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name)?.classList.add('active');
+    event.target.classList.add('active');
+}
 
-    function updateSelectedCount() {
-        const checkboxes = document.querySelectorAll('.file-checkbox:checked');
-        selectedFiles.clear();
-        checkboxes.forEach(cb => selectedFiles.add(cb.value));
-        document.getElementById('selectedCount').innerText = selectedFiles.size;
-    }
+let selectedFiles = new Set();
+let currentJobId  = null;
+let generatedLink = null;
 
-    // Select All
-    document.getElementById('selectAllCheckbox')?.addEventListener('change', (e) => {
-        document.querySelectorAll('.file-checkbox').forEach(cb => cb.checked = e.target.checked);
-        updateSelectedCount();
-    });
+function updateSelected() {
+    selectedFiles.clear();
+    document.querySelectorAll('.file-cb:checked').forEach(cb => selectedFiles.add(cb.value));
+    document.getElementById('statSelected').innerText = selectedFiles.size;
+}
 
-    // Checkbox change
-    document.querySelectorAll('.file-checkbox').forEach(cb => {
-        cb.addEventListener('change', updateSelectedCount);
-    });
+function toggleSelectAll() {
+    const cb = document.getElementById('selectAllCb');
+    document.querySelectorAll('.file-cb').forEach(c => c.checked = cb.checked);
+    updateSelected();
+}
 
-    // Download
-    document.getElementById('downloadBtn')?.addEventListener('click', async () => {
-        const files = Array.from(selectedFiles);
-        if (files.length === 0) {
-            showToast('Select at least one file', 'error');
-            return;
-        }
+document.querySelectorAll('.file-cb').forEach(cb => cb.addEventListener('change', updateSelected));
 
-        showProgress(true);
-        updateProgress(30, 'Creating ZIP...');
+document.getElementById('btnDownload')?.addEventListener('click', async () => {
+    const files    = Array.from(selectedFiles);
+    const password = document.getElementById('zipPassword').value;
 
-        try {
-            const response = await fetch('{{ route("zip.download.ajax") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ files: files })
-            });
+    if (!files.length) { showToast('Please select at least one file', 'error'); return; }
 
-            const data = await response.json();
-            
-            if (data.success) {
-                updateProgress(100, 'Complete!');
-                window.location.href = data.download_url;
-                showToast(`ZIP created with ${data.total_files} files`, 'success');
-                setTimeout(() => location.reload(), 2000);
-            } else {
-                showToast('Error creating ZIP', 'error');
-                showProgress(false);
-            }
-        } catch (error) {
-            showToast('Network error', 'error');
+    showProgress(true);
+    updateProgress(30, 'Creating ZIP link...');
+
+    try {
+        const res  = await postJson('{{ route("zip.download.ajax") }}', { files, password });
+        const data = await res.json();
+
+        if (data.success) {
+            updateProgress(100, 'Ready!');
+            generatedLink = data.download_url;
+            document.getElementById('generatedLink').innerText = data.download_url;
+            document.getElementById('linkCard').style.display = 'block';
+            showToast(`ZIP ready — ${data.total_files} files`, 'success');
+        } else {
+            showToast(data.message || 'Something went wrong', 'error');
             showProgress(false);
         }
+    } catch (e) {
+        showToast('Network error occurred', 'error');
+        showProgress(false);
+    }
+});
+
+function copyLink() {
+    if (generatedLink) {
+        navigator.clipboard.writeText(generatedLink);
+        showToast('Link copied to clipboard!', 'success');
+    }
+}
+
+function openLink() {
+    if (generatedLink) window.location.href = generatedLink;
+}
+
+let emailFiles = [];
+
+document.getElementById('btnEmail')?.addEventListener('click', () => {
+    emailFiles = Array.from(selectedFiles);
+    if (!emailFiles.length) { showToast('Please select at least one file', 'error'); return; }
+    openModal('emailModal');
+});
+
+async function sendEmailLink() {
+    const email    = document.getElementById('recipientEmail').value;
+    const password = document.getElementById('zipPassword').value;
+
+    if (!email || !email.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
+
+    try {
+        const res  = await postJson('{{ route("zip.email") }}', { email, files: emailFiles, password });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast(data.message, 'success');
+            closeModal('emailModal');
+            generatedLink = data.download_url;
+            document.getElementById('generatedLink').innerText = data.download_url;
+            document.getElementById('linkCard').style.display = 'block';
+        } else {
+            showToast('Failed to send email', 'error');
+        }
+    } catch (e) {
+        showToast('Network error occurred', 'error');
+    }
+}
+
+document.getElementById('btnQueue')?.addEventListener('click', async () => {
+    const files    = Array.from(selectedFiles);
+    const password = document.getElementById('zipPassword').value;
+
+    if (!files.length) { showToast('Please select at least one file', 'error'); return; }
+
+    try {
+        const res  = await postJson('{{ route("zip.queue") }}', { files, password });
+        const data = await res.json();
+
+        if (data.success) {
+            currentJobId = data.job_id;
+            document.getElementById('jobStatus').innerHTML =
+                `Job ID: <strong>#${data.job_id}</strong> — Status: <span class="badge badge-yellow">⏳ Pending</span>`;
+            document.getElementById('jobCard').style.display  = 'block';
+            document.getElementById('btnCheckJob').style.display = 'inline-block';
+            showToast('Job queued successfully! Run: php artisan queue:work', 'success');
+
+            setTimeout(() => autoPolling(data.job_id), 5000);
+        } else {
+            showToast('Failed to queue job', 'error');
+        }
+    } catch (e) {
+        showToast('Network error occurred', 'error');
+    }
+});
+
+async function checkJobStatus() {
+    if (!currentJobId) return;
+    await pollJob(currentJobId);
+}
+
+async function pollJob(jobId) {
+    try {
+        const res  = await fetch(`{{ url('/zip/job') }}/${jobId}/status`);
+        const data = await res.json();
+
+        const statusMap = {
+            'pending':    '<span class="badge badge-yellow">⏳ Pending</span>',
+            'processing': '<span class="badge badge-blue">⚙️ Processing</span>',
+            'completed':  '<span class="badge badge-green">✅ Completed</span>',
+            'failed':     '<span class="badge badge-red">❌ Failed</span>',
+        };
+
+        const row = document.getElementById(`jobRow_${jobId}`);
+        if (row) {
+            row.cells[2].innerHTML = statusMap[data.status] || data.status;
+            if (data.status === 'completed' && data.download_url) {
+                row.cells[4].innerHTML = `<a href="${data.download_url}" class="poll-btn" style="text-decoration:none">⬇️ Download</a>`;
+            }
+        }
+
+        if (jobId === currentJobId) {
+            document.getElementById('jobStatus').innerHTML =
+                `Job #${jobId} — ${statusMap[data.status] || data.status}` +
+                (data.download_url ? ` <a href="${data.download_url}" class="poll-btn" style="margin-left:8px">⬇️ Download</a>` : '');
+        }
+
+        return data.status;
+    } catch (e) {
+        console.error('Poll error:', e);
+    }
+}
+
+async function autoPolling(jobId) {
+    const status = await pollJob(jobId);
+    if (status === 'pending' || status === 'processing') {
+        setTimeout(() => autoPolling(jobId), 5000);
+    }
+}
+
+document.getElementById('btnFolderDownload')?.addEventListener('click', () => {
+    const folders  = Array.from(document.querySelectorAll('.folder-cb:checked')).map(cb => cb.value);
+    const password = document.getElementById('zipPassword').value;
+
+    if (!folders.length) { showToast('Please select at least one folder', 'error'); return; }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ route("zip.download.folder") }}';
+
+    const csrf = document.createElement('input');
+    csrf.type  = 'hidden';
+    csrf.name  = '_token';
+    csrf.value = document.querySelector('meta[name="csrf-token"]').content;
+    form.appendChild(csrf);
+
+    folders.forEach(f => {
+        const inp = document.createElement('input');
+        inp.type  = 'hidden';
+        inp.name  = 'folders[]';
+        inp.value = f;
+        form.appendChild(inp);
     });
 
-    // Email
-    let emailFiles = [];
-    document.getElementById('emailBtn')?.addEventListener('click', () => {
-        emailFiles = Array.from(selectedFiles);
-        if (emailFiles.length === 0) {
-            showToast('Select at least one file', 'error');
-            return;
-        }
-        document.getElementById('emailModal').style.display = 'flex';
-    });
+    if (password) {
+        const passInput = document.createElement('input');
+        passInput.type  = 'hidden';
+        passInput.name  = 'password';
+        passInput.value = password;
+        form.appendChild(passInput);
+    }
 
-    async function sendEmailLink() {
-        const email = document.getElementById('recipientEmail').value;
-        if (!email || !email.includes('@')) {
-            showToast('Enter valid email', 'error');
-            return;
-        }
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    showToast('Folder ZIP download started...', 'success');
+});
 
-        showProgress(true);
-        updateProgress(30, 'Sending...');
+const uploadArea = document.getElementById('uploadArea');
+const fileInput  = document.getElementById('fileInput');
+
+uploadArea?.addEventListener('click', () => fileInput.click());
+uploadArea?.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+uploadArea?.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+uploadArea?.addEventListener('drop', async e => {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    await uploadFiles(Array.from(e.dataTransfer.files));
+});
+fileInput?.addEventListener('change', async e => {
+    await uploadFiles(Array.from(e.target.files));
+    fileInput.value = '';
+});
+
+async function uploadFiles(files) {
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        showToast(`Uploading ${file.name}...`, 'info');
 
         try {
-            const response = await fetch('{{ route("zip.email") }}', {
+            const res  = await fetch('{{ route("files.upload") }}', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ email: email, files: emailFiles })
+                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                body: formData
             });
-
-            const data = await response.json();
-            
+            const data = await res.json();
             if (data.success) {
-                updateProgress(100, 'Sent!');
-                showToast(data.message, 'success');
-                closeEmailModal();
-                document.getElementById('recipientEmail').value = '';
-                setTimeout(() => showProgress(false), 1500);
+                showToast(`${data.file} uploaded successfully ✅`, 'success');
+                setTimeout(() => location.reload(), 800);
             } else {
-                showToast('Error sending email', 'error');
-                showProgress(false);
+                showToast(`Failed to upload: ${file.name}`, 'error');
             }
-        } catch (error) {
-            showToast('Network error', 'error');
-            showProgress(false);
+        } catch (e) {
+            showToast(`Error uploading: ${file.name}`, 'error');
         }
     }
+}
 
-    // Upload
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
+async function previewFile(filename) {
+    openModal('previewModal');
+    document.getElementById('previewTitle').innerText = filename;
+    document.getElementById('previewBody').innerText  = 'Loading...';
 
-    uploadArea?.addEventListener('click', () => fileInput.click());
-    uploadArea?.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.borderColor = '#4f46e5'; });
-    uploadArea?.addEventListener('dragleave', () => { uploadArea.style.borderColor = '#ddd'; });
-    uploadArea?.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        uploadArea.style.borderColor = '#ddd';
-        await uploadFiles(Array.from(e.dataTransfer.files));
+    try {
+        const res  = await fetch(`{{ url('files/preview') }}/${filename}`);
+        const data = await res.json();
+        document.getElementById('previewBody').innerText = data.content || data.message || 'Preview not available';
+    } catch (e) {
+        document.getElementById('previewBody').innerText = 'Error loading preview';
+    }
+}
+
+async function deleteFile(filename) {
+    if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
+
+    try {
+        const res  = await fetch(`{{ url('files/delete') }}/${filename}`, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(`${filename} deleted successfully`, 'success');
+            location.reload();
+        } else {
+            showToast('Failed to delete file', 'error');
+        }
+    } catch (e) {
+        showToast('Error occurred while deleting', 'error');
+    }
+}
+
+function showProgress(show) {
+    document.getElementById('progressWrap').style.display = show ? 'block' : 'none';
+    if (!show) document.getElementById('progressFill').style.width = '0%';
+}
+
+function updateProgress(pct, msg) {
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').innerText = msg;
+}
+
+function showToast(msg, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.style.background = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#333';
+    toast.innerText = msg;
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 3000);
+}
+
+function openModal(id)  { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+window.addEventListener('click', e => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; });
+
+function postJson(url, body) {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify(body)
     });
-
-    fileInput?.addEventListener('change', async (e) => {
-        await uploadFiles(Array.from(e.target.files));
-        fileInput.value = '';
-    });
-
-    async function uploadFiles(files) {
-        for (const file of files) {
-            const formData = new FormData();
-            formData.append('file', file);
-            showToast(`Uploading ${file.name}...`, 'info');
-            
-            try {
-                const response = await fetch('{{ route("files.upload") }}', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.success) {
-                    showToast(`${data.file} uploaded`, 'success');
-                    location.reload();
-                } else {
-                    showToast(`Failed: ${file.name}`, 'error');
-                }
-            } catch (error) {
-                showToast(`Error: ${file.name}`, 'error');
-            }
-        }
-    }
-
-    // Preview
-    async function previewFile(filename) {
-        const modal = document.getElementById('previewModal');
-        const title = document.getElementById('previewTitle');
-        const body = document.getElementById('previewBody');
-        
-        modal.style.display = 'flex';
-        title.innerText = `Preview: ${filename}`;
-        body.innerHTML = 'Loading...';
-        
-        try {
-            const response = await fetch(`{{ url("files/preview") }}/${filename}`);
-            const data = await response.json();
-            if (data.content) {
-                body.innerHTML = `<pre style="white-space:pre-wrap;">${data.content}</pre>`;
-            } else {
-                body.innerHTML = `<p>${data.message || 'Preview not available'}</p><p>Size: ${data.size}</p>`;
-            }
-        } catch (error) {
-            body.innerHTML = '<p style="color:red">Error loading preview</p>';
-        }
-    }
-
-    // Delete
-    async function deleteFile(filename) {
-        if (!confirm(`Delete "${filename}"?`)) return;
-        
-        try {
-            const response = await fetch(`{{ url("files/delete") }}/${filename}`, {
-                method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-            });
-            const data = await response.json();
-            if (data.success) {
-                showToast(`Deleted ${filename}`, 'success');
-                location.reload();
-            } else {
-                showToast('Delete failed', 'error');
-            }
-        } catch (error) {
-            showToast('Error deleting', 'error');
-        }
-    }
-
-    // Progress
-    function showProgress(show) {
-        document.getElementById('progressContainer').style.display = show ? 'block' : 'none';
-        if (!show) document.getElementById('progressFill').style.width = '0%';
-    }
-    function updateProgress(percent, message) {
-        document.getElementById('progressFill').style.width = percent + '%';
-        document.getElementById('progressText').innerText = message;
-    }
-
-    // Toast
-    function showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        toast.style.backgroundColor = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#333';
-        toast.innerText = message;
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 3000);
-    }
-
-    // Modal close
-    function closeModal() { document.getElementById('previewModal').style.display = 'none'; }
-    function closeEmailModal() { document.getElementById('emailModal').style.display = 'none'; }
-    window.onclick = (e) => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; }
-
-    // Initial
-    updateSelectedCount();
-    document.getElementById('totalFiles').innerText = {{ count($availableFiles) }};
+}
 </script>
 
 </body>
