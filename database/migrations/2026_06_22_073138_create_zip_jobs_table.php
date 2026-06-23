@@ -8,18 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('zip_downloads', function (Blueprint $table) {
+        Schema::create('zip_jobs', function (Blueprint $table) {
             $table->id();
             $table->string('zip_name');
-            $table->integer('total_files');
-            $table->boolean('is_password_protected')->default(false);
-            $table->string('user_ip')->nullable();
+            $table->string('status')->default('pending');
+            $table->longText('file_paths');
+            $table->string('password')->nullable();
+            $table->string('download_url')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('zip_downloads');
+        Schema::dropIfExists('zip_jobs');
     }
 };

@@ -18,8 +18,9 @@ return new class extends Migration
             $table->timestamp('expires_at');
             $table->timestamp('downloaded_at')->nullable();
             $table->integer('download_count')->default(0);
+            $table->boolean('is_prebuilt')->default(false);
             $table->timestamps();
-            
+
             $table->index('token');
             $table->index('expires_at');
         });
